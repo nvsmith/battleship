@@ -18,7 +18,7 @@ const view = {
     var cell = document.getElementById(location);
     cell.setAttribute("class", "miss");
   },
-}; // end view
+}; // end VIEW OBJECT
 
 // THE MODEL OBJECT:
 // Keeps the state of the game (logic for hits/misses) and
@@ -71,9 +71,58 @@ const model = {
     }
     return true;
   }, // end isSunk
-};
+}; // end MODEL OBJECT
 
-// Testing - Delete Later
-model.fire("24");
-model.fire("34");
-model.fire("44");
+// THE CONTROLLER OBJECT:
+// Gets and processes player input and
+// communicates this to the MODEL
+const controller = {
+  guesses: 0,
+
+  processGuess: function (guess) {
+    var location = parseGuess(guess);
+    if (location) {
+      this.guesses++;
+      var hit = model.fire(location);
+      if (hit && model.shipsSunk === model.numShips) {
+        view.displayMessage(
+          `You sank all my battleships in ${this.guesses} guesses.`
+        );
+      }
+    }
+  }, // end processGuess
+}; // end CONTROLLER OBJECT
+
+// Validate guess for the CONTROLLER
+function parseGuess(guess) {
+  var alphabet = ["A", "B", "C", "D", "E", "F", "G"];
+
+  // check user input
+  if (guess === null || guess.length !== 2) {
+    alert("Invalid guess. Please enter a letter and number on the board.");
+  } else {
+    var firstChar = guess.charAt(0);
+    // convert the first character (row input) to a number
+    var row = alphabet.indexOf(firstChar);
+    var column = guess.charAt(1);
+
+    // determine if guess is on the board
+    if (isNaN(row) || isNaN(column)) {
+      alert("Invalid guess. Please enter a letter and number on the board.");
+    } else if (
+      row < 0 ||
+      row >= model.boardSize ||
+      column < 0 ||
+      column >= model.boardSize
+    ) {
+      alert("Invalid guess. That's off the board!");
+    } else {
+      return row + column; // if guess is parsed, return guess location as a String value
+    }
+  }
+  return null; // failure to parse guess
+} // end parseGuess
+
+// DEBUGGING & TEST CODE
+controller.processGuess("A0");
+controller.processGuess("A6");
