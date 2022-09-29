@@ -123,6 +123,35 @@ function parseGuess(guess) {
   return null; // failure to parse guess
 } // end parseGuess
 
+// Page load initialization with event listener(s)
+function init() {
+  var fireButton = document.getElementById("fireButton");
+  fireButton.onclick = handleFireButton;
+  var guessInput = document.getElementById("guessInput");
+  guessInput.onkeydown = handleKeyPress;
+} // end init
+
+// Event Handler For Fire Button
+function handleFireButton() {
+  var guessInput = document.getElementById("guessInput");
+  // guess is stored in the value property of the input element
+  var guess = guessInput.value;
+  // pass the guess to the controller.
+  controller.processGuess(guess);
+} // end handleFireButton
+
+// Event Handler for Enter/Return Key Input
+function handleKeyPress(e) {
+  var fireButton = document.getElementById("fireButton");
+  if (e.key === "Enter" || e.keyCode === 13) {
+    fireButton.click();
+    return false;
+  }
+}
+
+// Initialize page loading
+window.onload = init;
+
 // DEBUGGING & TEST CODE
 controller.processGuess("A0");
 controller.processGuess("A6");
