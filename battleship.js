@@ -30,43 +30,15 @@ const model = {
   shipsSunk: 0,
 
   ships: [
-    { locations: ["06", "16", "26"], hits: ["", "", ""] },
-    { locations: ["24", "34", "44"], hits: ["", "", ""] },
-    { locations: ["10", "11", "12"], hits: ["", "", ""] },
+    { locations: [0, 0, 0], hits: ["", "", ""] },
+    { locations: [0, 0, 0], hits: ["", "", ""] },
+    { locations: [0, 0, 0], hits: ["", "", ""] },
   ],
-
-  // Create ships until the board is filled
-  generateShipLocations: function () {
-    var locations;
-    for (let i = 0; i < this.numShips; i++) {
-      do {
-        locations = this.generateShip(); // generate new locations
-      } while (this.collision(locations)); // if locations overlap, try again until they don't
-      this.ships[i].locations = locations; // assign working locations to ships array
-    }
-  }, // end generateShipLocations
-
-  // Create random locations for a ship
-  generateShip: function () {
-    var direction = Math.floor(Math.random() * 2); // random number: 0 or 1
-    var row;
-    var col;
-    if (direction === 1) {
-      // horizontal ship
-    } else {
-      // vertical ship
-    }
-
-    var newShipLocations = [];
-    for (let i = 0; i < this.shipLength; i++) {
-      if (direction === 1) {
-        // add location to horizontal array
-      } else {
-        // add location to vertical array
-      }
-    }
-    return newShipLocations; // array filled once all locations have generated
-  }, // end generateShip
+  // ships: [
+  //   { locations: ["06", "16", "26"], hits: ["", "", ""] },
+  //   { locations: ["24", "34", "44"], hits: ["", "", ""] },
+  //   { locations: ["10", "11", "12"], hits: ["", "", ""] },
+  // ],
 
   // Player fires a guess: Hit or Miss?
   fire: function (guess) {
@@ -102,6 +74,65 @@ const model = {
     }
     return true;
   }, // end isSunk
+
+  // Create ships until the board is filled
+  generateShipLocations: function () {
+    var locations;
+    for (let i = 0; i < this.numShips; i++) {
+      do {
+        locations = this.generateShip(); // generate new locations
+      } while (this.collision(locations)); // if locations overlap, try again until they don't
+      this.ships[i].locations = locations; // assign working locations to ships array
+    }
+  }, // end generateShipLocations
+
+  // Create random locations for a ship
+  generateShip: function () {
+    var row; // horizontal start location
+    var col; // vertical start location
+
+    var direction = Math.floor(Math.random() * 2); // 0 (vertical) or 1 (horizontal)
+    if (direction === 1) {
+      // horizontal ship's 1st location (any row, any column minus ship's length)
+      row = Math.floor(Math.random() * this.boardSize);
+      col = Math.floor(
+        Math.random() * (this.boardSize - (this.shipLength + 1))
+      );
+    } else {
+      // vertical ship's 1st location (any row minus ship's length, any column)
+      row = Math.floor(
+        Math.random() * (this.boardSize - (this.shipLength + 1))
+      );
+      col = Math.floor(Math.random() * this.boardSize);
+    }
+
+    var newShipLocations = [];
+    for (let i = 0; i < this.shipLength; i++) {
+      if (direction === 1) {
+        // add location to a horizontal array
+        newShipLocations.push(row + "" + (col + i)); // "" concats numbers as a string
+      } else {
+        // add location to a vertical array
+        newShipLocations.push(row + i + "" + col);
+      }
+    }
+    return newShipLocations; // array filled once all locations have generated
+  }, // end generateShip
+
+  // Check for location overlaps
+  collision: function (locations) {
+    for (let i = 0; i < this.numShips; i++) {
+      var ship = this.ships[i]; // ships already on board
+      // do new locations already exist?
+      for (let j = 0; j < locations.length; j++) {
+        // a numbered index == location already exists
+        if (ship.locations.indexOf(locations[j]) >= 0) {
+          return true; // collision detected
+        }
+      }
+    }
+    return false; // no collisions
+  }, // end collision
 }; // end MODEL OBJECT
 
 // THE CONTROLLER OBJECT:
@@ -160,6 +191,8 @@ function init() {
   fireButton.onclick = handleFireButton;
   var guessInput = document.getElementById("guessInput");
   guessInput.onkeydown = handleKeyPress;
+
+  model.generateShipLocations();
 } // end init
 
 // Event Handler For Fire Button
@@ -186,6 +219,5 @@ function handleKeyPress(e) {
 // Initialize page loading
 window.onload = init;
 
-// DEBUGGING & TEST CODE
-controller.processGuess("A0");
-controller.processGuess("A6");
+// BUG: re-entering a hit results in another hit on same spot
+// TODO: separate script into smaller, component files
