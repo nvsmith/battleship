@@ -24,11 +24,9 @@ const view = {
 // Keeps the state of the game (logic for hits/misses) and
 // communicates changes to the VIEW
 const model = {
-  // the size of the grid for the board
-  boardSize: 7,
+  boardSize: 7, // grid square size
   numShips: 3,
-  // the number of hits each ship can take
-  shipLength: 3,
+  shipLength: 3, // the number of hits each ship can take
   shipsSunk: 0,
 
   ships: [
@@ -36,6 +34,39 @@ const model = {
     { locations: ["24", "34", "44"], hits: ["", "", ""] },
     { locations: ["10", "11", "12"], hits: ["", "", ""] },
   ],
+
+  // Create ships until the board is filled
+  generateShipLocations: function () {
+    var locations;
+    for (let i = 0; i < this.numShips; i++) {
+      do {
+        locations = this.generateShip(); // generate new locations
+      } while (this.collision(locations)); // if locations overlap, try again until they don't
+      this.ships[i].locations = locations; // assign working locations to ships array
+    }
+  }, // end generateShipLocations
+
+  // Create random locations for a ship
+  generateShip: function () {
+    var direction = Math.floor(Math.random() * 2); // random number: 0 or 1
+    var row;
+    var col;
+    if (direction === 1) {
+      // horizontal ship
+    } else {
+      // vertical ship
+    }
+
+    var newShipLocations = [];
+    for (let i = 0; i < this.shipLength; i++) {
+      if (direction === 1) {
+        // add location to horizontal array
+      } else {
+        // add location to vertical array
+      }
+    }
+    return newShipLocations; // array filled once all locations have generated
+  }, // end generateShip
 
   // Player fires a guess: Hit or Miss?
   fire: function (guess) {
@@ -138,6 +169,8 @@ function handleFireButton() {
   var guess = guessInput.value;
   // pass the guess to the controller.
   controller.processGuess(guess);
+  // clear input field after submission
+  guessInput.value = "";
 } // end handleFireButton
 
 // Event Handler for Enter/Return Key Input
@@ -145,6 +178,7 @@ function handleKeyPress(e) {
   var fireButton = document.getElementById("fireButton");
   if (e.key === "Enter" || e.keyCode === 13) {
     fireButton.click();
+    // prevent form from doing anything else after input
     return false;
   }
 }
